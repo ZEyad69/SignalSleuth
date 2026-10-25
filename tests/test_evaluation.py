@@ -25,3 +25,22 @@ def test_series_011_window_500_numbers():
     alerts[11800:11806] = True   # 6 inside
     alerts[13000:13007] = True   # 7 outside
     assert confusion_counts(labels, alerts) == (6, 7, 295)
+
+from signalsleuth.evaluation import precision_recall_f1
+
+
+def test_prf_series_011_window_500():
+    p, r, f1 = precision_recall_f1(6, 7, 295)
+    assert abs(p - 6 / 13) < 1e-9
+    assert abs(r - 6 / 301) < 1e-9
+    assert abs(f1 - 12 / 314) < 1e-9
+
+
+def test_prf_series_011_window_100_nothing_found():
+    assert precision_recall_f1(0, 5, 301) == (0.0, 0.0, 0.0)
+
+
+def test_prf_no_alerts_gives_no_nan():
+    p, r, f1 = precision_recall_f1(0, 0, 301)
+    assert not np.isnan(p) and not np.isnan(r) and not np.isnan(f1)
+   
