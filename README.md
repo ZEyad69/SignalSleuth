@@ -28,6 +28,18 @@ The main idea is to study how we can detect unusual patterns in data and how dif
 - `figures/` — Plots and visualizations
 - `reports/` — Experiment notes and results
 
+## Visualizations
+
+The plots below show examples from the current experiments.
+
+### Overview
+![SignalSleuth overview](figures/overview.png)
+
+### Anomaly Scores
+![Anomaly scores with window size 100](figures/scores_011_w100.png)
+
+![Anomaly scores with window size 500](figures/scores_011_w500.png)
+
 ## Current Status
 
 I'm still working on the implementation and experiments. The methods and evaluation process may change as I learn more and test different approaches.
