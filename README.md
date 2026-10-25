@@ -27,6 +27,28 @@ The main idea is to study how we can detect unusual patterns in data and how dif
 - `scripts/` — Scripts for running experiments
 - `figures/` — Plots and visualizations
 - `reports/` — Experiment notes and results
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ZEyad69/SignalSleuth.git
+cd SignalSleuth
+```
+
+Install the dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+## Running Tests
+
+Run the test suite with:
+
+```bash
+python -m pytest -v
+```
 
 ## Visualizations
 
