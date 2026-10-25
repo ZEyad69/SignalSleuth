@@ -4,7 +4,16 @@
 SignalSleuth is a project I'm currently working on to explore time-series anomaly detection using Python.
 
 The main idea is to study how we can detect unusual patterns in data and how different evaluation methods affect the results.
+## Evaluation Strategy
 
+SignalSleuth investigates how evaluation choices affect time-series anomaly detection results.
+
+- Compare point-wise Precision, Recall, and F1 with and without Point Adjustment (PA).
+- Evaluate detected anomalous events and separate false alarms.
+- Select detection thresholds using training or calibration data to avoid data leakage.
+- Compare the proposed approach against a simple baseline.
+
+These methods are under investigation; no performance claims are made until experiments are completed.
 ## What I'm Working On
 
 - Exploring ways to detect unusual patterns in time-series data.
