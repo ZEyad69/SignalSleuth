@@ -26,8 +26,22 @@ scores = rolling_mad_score(s.values, window=WINDOW)
 print(len(s.values), len(scores))
 train_max = scores[:s.train_end].max()
 anomaly_max = scores[s.anomaly_start:s.anomaly_end + 1].max()
-print("highest score in train:", train_max)
-print("highest score in anomaly:", anomaly_max)
+# 1. threshold chosen from the train part only
+threshold = train_max
+
+# 2. all alerts after the train part
+alerts_after_train = (scores[s.train_end:] > threshold).sum()
+
+# 3. alerts inside the real anomaly (the correct ones)
+alerts_in_anomaly = (scores[s.anomaly_start:s.anomaly_end + 1] > threshold).sum()
+
+# 4. false alarms = alerts that are not inside the anomaly
+false_alarms = alerts_after_train - alerts_in_anomaly
+
+print("threshold:", threshold)
+print("alerts after train:", alerts_after_train)
+print("alerts inside anomaly:", alerts_in_anomaly)
+print("false alarms:", false_alarms)
 # two plots, one above the other, sharing the same x axis
 fig, axes = plt.subplots(2, 1, figsize=(12, 7), sharex=True)
 
