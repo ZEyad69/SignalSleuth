@@ -1,3 +1,4 @@
+![CI](https://github.com/ZEyad69/SignalSleuth/actions/workflows/python-app.yml/badge.svg)
 # SignalSleuth
 
 SignalSleuth is a project I'm currently working on to explore time-series anomaly detection using Python.
