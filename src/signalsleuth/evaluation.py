@@ -44,3 +44,15 @@ def point_adjust(labels, alerts):
                 adjusted[j] = True                  # <-- changed name
                 j += 1
     return adjusted                                 # <-- changed name
+
+def count_segments(mask):
+    #  return how many separate groups of consecutive True values
+    segments = 0
+    in_segment = False
+    for val in mask:
+        if val and not in_segment:
+            segments += 1
+            in_segment = True
+        elif not val:
+            in_segment = False
+    return segments

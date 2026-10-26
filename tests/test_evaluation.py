@@ -82,4 +82,32 @@ def test_point_adjust_two_segments_only_hit_one_is_adjusted():
     alerts = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0])
     adjusted = point_adjust(labels, alerts)
     assert confusion_counts(labels, adjusted) == (2, 0, 3)
-   
+
+from signalsleuth.evaluation import count_segments
+
+
+def test_count_segments_basic():
+    assert count_segments(np.array([0, 1, 1, 0, 1, 0, 0, 1, 1, 1])) == 3
+
+
+def test_count_segments_edges_and_empty():
+    assert count_segments(np.array([0, 0, 0, 0])) == 0
+    assert count_segments(np.array([1, 1, 1, 1])) == 1
+    assert count_segments(np.array([1, 0, 1])) == 2
+
+
+def test_count_segments_accepts_bool():
+    assert count_segments(np.array([True, False, True, True])) == 2
+
+
+def test_count_segments_false_alarms_series_011_style():
+    # 7 false-alarm points: as ONE group vs as THREE groups (positions are made up)
+    one = np.zeros(30000, dtype=bool)
+    one[13000:13007] = True
+    three = np.zeros(30000, dtype=bool)
+    three[13000:13003] = True
+    three[15000:15002] = True
+    three[20000:20002] = True
+    assert one.sum() == three.sum() == 7
+    assert count_segments(one) == 1
+    assert count_segments(three) == 3
