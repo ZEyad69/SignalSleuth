@@ -21,3 +21,26 @@ def precision_recall_f1(tp, fp, fn):
     recall= tp / (tp + fn) if (tp + fn) > 0 else 0
     f1= 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
     return precision, recall, f1    
+
+def point_adjust(labels, alerts):
+    # start from the original alerts, so false alarms outside the anomaly stay as they are
+    # astype(bool) also makes a NEW array, so the input is never changed
+    adjusted = np.asarray(alerts).astype(bool)      # <-- changed
+
+    in_anomaly = False
+    for i in range(len(labels)):
+        if labels[i] == 1:
+            in_anomaly = True
+        elif in_anomaly and labels[i] == 0:
+            in_anomaly = False
+        if in_anomaly and alerts[i]:
+            # mark all points in the current anomaly as alerted
+            j = i
+            while j >= 0 and labels[j] == 1:
+                adjusted[j] = True                  # <-- changed name
+                j -= 1
+            j = i + 1
+            while j < len(labels) and labels[j] == 1:
+                adjusted[j] = True                  # <-- changed name
+                j += 1
+    return adjusted                                 # <-- changed name
