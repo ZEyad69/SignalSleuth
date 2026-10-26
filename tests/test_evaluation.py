@@ -111,3 +111,36 @@ def test_count_segments_false_alarms_series_011_style():
     assert one.sum() == three.sum() == 7
     assert count_segments(one) == 1
     assert count_segments(three) == 3
+
+from signalsleuth.evaluation import evaluate_alerts
+
+
+def test_evaluate_series_011_window_500():
+    labels = make_labels(30000, 11800, 12100)
+    alerts = np.zeros(30000, dtype=bool)
+    alerts[11800:11806] = True    # 6 inside
+    alerts[13000:13007] = True    # 7 outside, one group
+    r = evaluate_alerts(labels, alerts)
+    assert (r["tp"], r["fp"], r["fn"]) == (6, 7, 295)
+    assert abs(r["f1"] - 12 / 314) < 1e-9
+    assert abs(r["pa_f1"] - 602 / 609) < 1e-9
+    assert r["false_alarm_events"] == 1
+    assert r["anomaly_detected"] is True
+
+
+def test_evaluate_series_011_window_100_nothing_found():
+    labels = make_labels(30000, 11800, 12100)
+    alerts = np.zeros(30000, dtype=bool)
+    alerts[13000:13005] = True    # 5 false alarms, none inside
+    r = evaluate_alerts(labels, alerts)
+    assert r["f1"] == 0.0 and r["pa_f1"] == 0.0
+    assert r["anomaly_detected"] is False
+
+
+def test_false_alarm_points_vs_events():
+    labels = make_labels(100, 40, 50)
+    alerts = np.zeros(100, dtype=bool)
+    alerts[[5, 6, 7, 80, 90]] = True    # 5 false-alarm points, 3 separate groups
+    r = evaluate_alerts(labels, alerts)
+    assert r["fp"] == 5
+    assert r["false_alarm_events"] == 3
