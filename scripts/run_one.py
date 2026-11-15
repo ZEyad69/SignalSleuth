@@ -12,7 +12,7 @@ DATA_DIR = Path(
 )
 FILE = next(DATA_DIR.glob("011_*"))
 
-result = run_series(FILE, window=500)
+result = run_series(FILE, window=100)
 
 # print every key and its value, one per line
 for key, value in result.items():
