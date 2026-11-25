@@ -8,7 +8,8 @@ from signalsleuth.evaluation import make_labels, evaluate_alerts
 def run_series(path, window=500):
     # 1. load the series (values, where train ends, where the anomaly is)
     series = load_series(path)
-
+    if series.train_end <= 2 * window:
+     raise ValueError("train part is too short for this window")
     # 2. one anomaly score for every point
     scores = rolling_mad_score(series.values, window=window)
 
