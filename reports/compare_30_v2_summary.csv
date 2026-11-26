@@ -1,0 +1,6 @@
+detector,series,ucr_hit_rate,ucr_hit_lo,ucr_hit_hi,anomaly_found_rate,median_f1,median_pa_f1,pa_f1_lo,pa_f1_hi,median_false_alarm_events,fa_lo,fa_hi
+mad,30,0.033,0.0,0.1,0.133,0.0,0.0,0.0,0.0,2.5,1.5,9.5
+shape,30,0.433,0.267,0.6,0.5,0.002,0.004,0.0,0.276,4.5,2.5,8.0
+iforest,30,0.2,0.067,0.367,0.233,0.0,0.0,0.0,0.0,4.5,2.0,10.0
+diff,30,0.3,0.133,0.467,0.233,0.0,0.0,0.0,0.0,4.0,1.0,6.0
+random,30,0.0,0.0,0.0,0.067,0.0,0.0,0.0,0.0,4.0,3.0,8.5
