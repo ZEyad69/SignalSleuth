@@ -1,0 +1,5 @@
+detector,events,base_risk,risk_at_50%_coverage,risk_at_25%_coverage,mean_risk_over_coverage
+mad,3356,0.968,0.959,0.948,0.954
+iforest,13197,0.976,0.968,0.956,0.961
+diff,26116,0.983,0.977,0.967,0.971
+random,2666,0.974,0.964,0.964,0.963

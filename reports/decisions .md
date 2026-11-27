@@ -55,3 +55,23 @@ One entry per decision: what, why, and what it cost. Newer entries can change ol
 - Decision: each finished (file, detector) pair is written to the CSV at once, and a restart skips pairs already there. Heavy shape runs start first.
 - Why: the shape detector needs about 328 CPU minutes for 250 series and one file alone took 865 s on the 30-series run.
 - Note: a failed pair is not retried; delete its row to retry.
+
+## D-12 Abstention works on alert EVENTS, not points
+- Decision: alert points are grouped into events (runs closer than 100 points are merged). An event is TRUE if it touches the anomaly extended by max(100, anomaly length); all other events are false alarms.
+- Why: on the 250 series the window-based detectors gave 4 to 11 false-alarm points per false event (mad 4.1, iforest 9.7, shape 10.9), so points are not independent. The number of false points was 5 to 97 times what an independent-scores guarantee predicts, while `random` matched it (1.16). Events are close to independent.
+
+## D-13 Strength of an alert event: excess over the threshold
+- Decision: strength = (peak score - threshold) / (highest calibration score - median calibration score), capped at 1000.
+- Why: it has no unit, so one cut can be pooled over series, and it still works when scores are 0 or flat (a ratio peak / threshold would not).
+
+## D-14 Second cut learned from a backtest on the train part
+- Decision: the same pipeline is run on the train part alone (its first 70% plays "train", its last 30% plays "test"). All alert events there are false by construction. The cut of a detector is the 90% quantile of their strengths, pooled over all series. q = 0.9 was fixed before looking at results. Between the base threshold and the cut an alert is "uncertain"; above it, "confident".
+- Why: the calibration part cannot say anything above its own maximum.
+- Uses: only train parts (of all series), no test data and no label.
+- Check: the share of REAL false events above the cut should be close to 1 - q. If not, the backtest does not transfer to this detector.
+- Known mismatch: the calibration part of the backtest (21% of the train part) is shorter than in the real run (30%). `--pseudo-fraction` can change the split.
+- Limit: it assumes the end of the train part looks like the test part. Drift breaks that.
+
+## D-15 Drift stress test
+- Decision: `add_drift` changes only the test part (level step, linear trend, or scale change). Cuts are learned on the clean run and evaluated on the drifted run.
+- Why: the roadmap asks how abstention behaves under drift; the calibration check above tells how far the guarantee breaks.

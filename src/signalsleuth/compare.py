@@ -66,12 +66,20 @@ def _random(series, calib_fraction, seed=0):
 DETECTORS = {"mad": _mad, "shape": _shape, "iforest": _iforest, "diff": _diff, "random": _random}
 
 
+def compute_scores(series, detector, calib_fraction=CALIB_FRACTION, **params):
+    """Scores for every point, where the calibration part starts, and the threshold.
+
+    The threshold is the highest score in the calibration part (the end of the train part).
+    Returns (scores, calib_start, threshold).
+    """
+    scores, calib_start = DETECTORS[detector](series, calib_fraction, **params)
+    threshold = float(scores[calib_start:series.train_end].max())
+    return scores, calib_start, threshold
+
+
 def run_detector(path, detector, calib_fraction=CALIB_FRACTION, **params):
     series = load_series(path)
-    scores, calib_start = DETECTORS[detector](series, calib_fraction, **params)
-
-    # threshold: highest score in the calibration part (the end of the train part)
-    threshold = float(scores[calib_start:series.train_end].max())
+    scores, calib_start, threshold = compute_scores(series, detector, calib_fraction, **params)
 
     alerts = scores > threshold
     labels = make_labels(len(series.values), series.anomaly_start, series.anomaly_end)
