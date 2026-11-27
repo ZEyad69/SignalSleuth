@@ -56,3 +56,51 @@ def wilcoxon_paired(a, b):
     if np.allclose(a, b):
         return 1.0
     return float(stats.wilcoxon(a, b).pvalue)
+
+
+# ---------------------------------------------------------------------------
+# PA%K (Kim et al., AAAI 2022): point adjustment only for well-detected segments
+# ---------------------------------------------------------------------------
+def _segments(mask):
+    """Start (included) and end (excluded) of every run of True values."""
+    m = np.concatenate([[0], np.asarray(mask).astype(int), [0]])
+    d = np.diff(m)
+    return np.where(d == 1)[0], np.where(d == -1)[0]
+
+
+def pa_k_f1_curve(labels, alerts, ks=range(0, 101)):
+    """F1 after PA%K for every K (in percent).
+
+    A true anomaly segment is adjusted (counted as fully detected) only if the share of its
+    points that are alerts is STRICTLY larger than K%. So K = 0 is ordinary PA (one alert is
+    enough) and K = 100 is plain point-wise F1 (nothing is ever adjusted).
+    Alerts outside the true segments are never changed, so they stay false alarms.
+    """
+    labels = np.asarray(labels).astype(bool)
+    alerts = np.asarray(alerts).astype(bool)
+    if labels.shape != alerts.shape:
+        raise ValueError("labels and alerts must have the same length")
+
+    starts, ends = _segments(labels)
+    lengths = ends - starts
+    hit_in_seg = np.array([alerts[s:e].sum() for s, e in zip(starts, ends)], dtype=float)
+    share = hit_in_seg / np.maximum(lengths, 1)                 # share of detected points, 0..1
+    fp = int(np.sum(alerts & ~labels))
+    total_pos = int(labels.sum())
+
+    f1 = []
+    for k in ks:
+        adjusted = share > (k / 100.0)
+        tp = int(np.where(adjusted, lengths, hit_in_seg).sum())
+        fn = total_pos - tp
+        denom = 2 * tp + fp + fn
+        f1.append(2 * tp / denom if denom > 0 else 0.0)         # same as 2PR/(P+R)
+    return np.array(f1)
+
+
+def pa_k_auc(labels, alerts, ks=range(0, 101)):
+    """Area under the F1-vs-K curve, scaled to 0..1 (trapezoid rule, K from 0 to 100)."""
+    ks = np.asarray(list(ks), dtype=float)
+    f1 = pa_k_f1_curve(labels, alerts, ks)
+    area = np.sum((f1[1:] + f1[:-1]) / 2.0 * np.diff(ks))
+    return float(area / (ks[-1] - ks[0]))

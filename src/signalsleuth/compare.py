@@ -7,16 +7,25 @@ Rules (the same for every detector):
 3. The threshold is the highest score in the calibration part.
 4. Alerts are the points whose score is above the threshold.
 5. Evaluation uses only the part AFTER the train part:
-   point-wise and PA metrics (with the threshold) and the UCR top-1 hit (without any threshold).
+   point-wise, PA and PA%K-AUC metrics (with the threshold) and the UCR top-1 hit (without it).
 """
 from signalsleuth.advanced_detectors import iforest_score, nn_shape_score
 from signalsleuth.baselines import abs_diff_score, random_score
 from signalsleuth.data import load_series
 from signalsleuth.detectors import rolling_mad_score
 from signalsleuth.evaluation import evaluate_alerts, make_labels
-from signalsleuth.evaluation_extra import ucr_top1_hit
+from signalsleuth.evaluation_extra import pa_k_auc, ucr_top1_hit
 
 CALIB_FRACTION = 0.3
+
+# the setups used in every comparison run (fixed BEFORE looking at results)
+DEFAULT_SETUPS = [
+    ("mad", {"window": 250}),
+    ("shape", {"m": 100}),
+    ("iforest", {"m": 100, "seed": 0}),
+    ("diff", {}),
+    ("random", {"seed": 0}),
+]
 
 
 def _fit_end(series, calib_fraction):
@@ -72,6 +81,14 @@ def run_detector(path, detector, calib_fraction=CALIB_FRACTION, **params):
 
     # threshold-free metric: is the single highest score in the test part on the anomaly?
     hit, top = ucr_top1_hit(scores, series.train_end, series.anomaly_start, series.anomaly_end)
+
+    # PA%K area under the F1-vs-K curve, same alerts and same cut as the other metrics
+    result["pak_auc"] = pa_k_auc(labels[series.train_end:], alerts[series.train_end:])
+
+    # facts needed later (effect of anomaly length on PA, effect of train length on runtime)
+    result["anomaly_len"] = series.anomaly_end - series.anomaly_start + 1
+    result["train_end"] = series.train_end
+    result["n"] = len(series.values)
 
     result["name"] = series.name
     result["detector"] = detector

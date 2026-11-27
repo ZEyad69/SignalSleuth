@@ -21,13 +21,13 @@ Median point-wise F1 is 0 to 0.002 and median PA-F1 is 0 to 0.004 for every dete
 ## What the numbers support
 1. Rolling MAD found the anomaly in 1 of 30 series. It did worse than the training-free `diff` baseline, so on UCR it is a weak baseline.
 2. The shape detector beat MAD: it found 12 series that MAD missed, and MAD found none that shape missed (exact McNemar p < 0.001).
-3. Shape vs `diff`: shape-only 8 series, diff-only 4 series, McNemar p = 0.39. With 30 series we cannot say the shape detector is better than the simple baseline. The 250-series run has to decide this.
+3. Shape vs `diff`: shape-only 8 series, diff-only 4 series, McNemar p = 0.39. With 30 series we cannot say the shape detector is better than the simple baseline. The 250-series run had to decide this: there the difference became significant (70 vs 43 series, McNemar p = 0.014, Holm-corrected 0.028; see `results.md`).
 4. Isolation Forest found 6 series. Against `diff` the difference is not significant (5 vs 2 series, p = 0.45).
-5. The `random` score never hit, so the hit rates above are not luck.
+5. The `random` score hit 0 of these 30 series, but the 250-series run shows its chance level is not zero (14 of 250, 5.6%), so hit rates of that size say nothing. A zero in a sample of 30 is a small-sample result, not a rule.
 
 ## What the numbers do not support
-- F1 is about 0 for every detector: with this threshold rule there are few alerts inside the anomaly and several false-alarm events outside it. This motivates the abstention phase. It says nothing yet about how much Point Adjustment inflates scores on UCR.
-- Runtime and failures (exploratory, post hoc): the shape detector took 18.8 minutes for the 30 series, 77% of it in one file. It found 3 of the 11 series where it ran 5 s or longer, against 10 of 19 for the others (Fisher p = 0.26, not significant). A possible cause is that a long, varying reference makes normal windows look unusual. This was NOT tested.
+- F1 is about 0 for every detector: with this threshold rule there are few alerts inside the anomaly and several false-alarm events outside it. This motivates the abstention phase. It says nothing about Point Adjustment on its own; the 250-series run measures that (see `results.md`).
+- Runtime and train length (updated after the 250-series run): on these 30 series the shape detector took 18.8 minutes, 77% of it in one file. It found 3 of the 11 series where it ran 5 s or longer, against 10 of 19 for the others (Fisher p = 0.26, not significant). The idea that a long reference part hurts the shape detector in particular was NOT supported by the 250-series run: all five detectors, including `diff` and `random`, which have no reference part, have a lower hit rate in the longest-train group than in the shortest one (shape 0.569 vs 0.244, `diff` 0.510 vs 0.207). Train length also goes with series length, so that split does not test the idea either.
 
 ## Check of the shape detector
 Its distances were compared with stumpy's matrix profile (AB-join, same windows, same z-normalisation): maximum absolute difference 0.00003 on a made-up series and 0.0001 on `112_UCR_Anomaly_BIDMC1`, with the same top-scoring window. Neither series has flat windows, which the two implementations treat differently.

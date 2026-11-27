@@ -38,7 +38,7 @@ def test_result_has_the_expected_keys(tmp_path, detector):
     r = run_detector(path, detector, **PARAMS[detector])
     for key in ["tp", "fp", "fn", "precision", "recall", "f1", "pa_f1",
                 "false_alarm_events", "anomaly_detected", "name", "detector", "threshold",
-                "ucr_hit", "top_index"]:
+                "ucr_hit", "top_index", "pak_auc", "anomaly_len", "train_end", "n"]:
         assert key in r
     assert r["detector"] == detector
 

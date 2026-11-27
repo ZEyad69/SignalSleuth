@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import numpy as np
 import pandas as pd
 
-from signalsleuth.compare import run_detector
+from signalsleuth.compare import DEFAULT_SETUPS, run_detector
 from signalsleuth.evaluation_extra import bootstrap_ci, mcnemar_exact, wilcoxon_paired
 
 DEFAULT_DIR = Path(
@@ -31,13 +31,7 @@ DEFAULT_DIR = Path(
 )
 DATA_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_DIR
 N_FILES = 30
-SETUPS = [
-    ("mad", {"window": 250}),
-    ("shape", {"m": 100}),
-    ("iforest", {"m": 100, "seed": 0}),
-    ("diff", {}),
-    ("random", {"seed": 0}),
-]
+SETUPS = DEFAULT_SETUPS
 REPORTS = Path(__file__).resolve().parents[1] / "reports"
 REPORTS.mkdir(exist_ok=True)
 OUT = REPORTS / "compare_30_v2.csv"
