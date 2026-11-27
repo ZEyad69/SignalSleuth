@@ -1,8 +1,17 @@
+
 ![CI](https://github.com/ZEyad69/SignalSleuth/actions/workflows/python-app.yml/badge.svg)
 
 # SignalSleuth
 
 Time-series anomaly detection, evaluated honestly. SignalSleuth compares five detectors on all 250 series of the UCR Anomaly Archive with one threshold rule, several metrics (with and without Point Adjustment), paired statistical tests, and a way for a detector to say "not sure".
+
+## Current Status
+
+The core implementation and the main evaluation experiments are complete. The repository includes the Python project configuration (`pyproject.toml`), automated tests, a GitHub Actions CI workflow, experiment reproduction scripts, and project documentation.
+
+The technical report and project blog post are available in the `docs/` directory. The current results, methodology, and limitations are documented in this README and the supporting reports.
+
+The project is complete as a portfolio project. The items listed under Future improvements are optional research extensions, not unfinished requirements for the current release.
 
 **In short**
 
@@ -42,16 +51,16 @@ Published anomaly detection results depend heavily on evaluation choices: where 
 
 ## Architecture
 
-```
+```text
 src/signalsleuth/
   data.py                 load_series(): reads a UCR file, train end and anomaly location come from the file name
   detectors.py            rolling median / MAD score
   advanced_detectors.py   shape detector (nearest normal window) and Isolation Forest
-  baselines.py            diff and random baselines
-  evaluation.py           point-wise P/R/F1, Point Adjustment, false-alarm events
-  evaluation_extra.py     UCR top-1 hit, PA%K, bootstrap, McNemar, Wilcoxon
-  compare.py              the five detectors under one threshold rule
-  abstention.py           alert events, backtest cut, drift injection, risk-coverage
+  baselines.py             diff and random baselines
+  evaluation.py            point-wise P/R/F1, Point Adjustment, false-alarm events
+  evaluation_extra.py      UCR top-1 hit, PA%K, bootstrap, McNemar, Wilcoxon
+  compare.py               the five detectors under one threshold rule
+  abstention.py            alert events, backtest cut, drift injection, risk-coverage
 scripts/                  run_compare_250.py, analyze_compare_250.py, run_abstention.py,
                           analyze_abstention.py, make_summary_figure.py, reproduce.py, plots
 tests/                    pytest suite (leakage checks, metric definitions, abstention)
@@ -129,9 +138,14 @@ Series 011 (30,000 points, an anomaly of 301 points) was the first real test of 
 
 ## Future improvements
 
-- Run the shape detector under drift (a trend is the drift that can affect it), and test a drift check based on the event rate.
-- A seed per series for the random baseline; several windows per detector; a second benchmark.
-- Package the project (`pyproject.toml`), log experiments in SQLite, run the tests in CI.
+The current project is complete, but several optional research extensions could be explored in future work:
+
+- Run the shape detector under drift, especially trend drift.
+- Test a drift check based on changes in the alert-event rate.
+- Use an independent random seed for each series in the random baseline.
+- Evaluate multiple window sizes for each detector.
+- Add a second benchmark dataset to examine how well the findings generalize.
+- Store experiment metadata and results in SQLite for easier experiment tracking.
 
 ## Reproduce
 
