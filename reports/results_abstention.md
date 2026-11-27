@@ -1,4 +1,4 @@
-# Result #2: saying "not sure" (abstention) on the 250 UCR series (draft)
+﻿# Result #2: saying "not sure" (abstention) on the 250 UCR series
 
 Numbers come from `reports/abstention_events_table.csv`, `reports/abstention_events_riskcov.csv` and `figures/abstention_events_risk_coverage.png`.
 
@@ -65,3 +65,4 @@ An idea, not tested: the number of alert events is itself a drift signal. `diff`
 - The `random` control uses the same seed in every series, so its scores repeat from series to series and the control is less strict than it looks. A different seed per series is better.
 - Series from the same source may not be independent, so intervals may be too optimistic.
 - Drift: three synthetic drifts of strengths chosen by us (1 and 2 standard deviations, a factor 2), on MAD, Isolation Forest, `diff` and `random`. The shape detector was not run under drift. Real drift is more varied, and no remedy was tested.
+

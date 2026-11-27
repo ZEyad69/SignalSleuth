@@ -75,3 +75,14 @@ One entry per decision: what, why, and what it cost. Newer entries can change ol
 ## D-15 Drift stress test
 - Decision: `add_drift` changes only the test part (level step, linear trend, or scale change). Cuts are learned on the clean run and evaluated on the drifted run.
 - Why: the roadmap asks how abstention behaves under drift; the calibration check above tells how far the guarantee breaks.
+
+## D-16 Known weakness of the `random` baseline: one seed for all series
+- Fact: `random_score(values, seed=0)` gives the same random numbers in every series (shorter series are prefixes of longer ones), so the scores repeat from series to series.
+- Effect: the `random` control is less strict than it looks (its variance across series is under-estimated). Its hit rate in Result #1 (14 of 250) and its rows in Result #2 are rough chance levels.
+- Not changed yet. A fix would be a seed that depends on the series name; the `random` rows of both results would then change and the two result files would need new numbers.
+## D-17 What the drift tests say about the second cut
+- Level, trend and scale drift were applied to the test part only, with cuts learned on the clean run (MAD, Isolation Forest, `diff`, `random`; the shape detector was not run).
+- The share of false events that become confident stays close to the target for MAD and Isolation Forest at high cuts, but fails for `diff` under an amplitude change (0.458 against 0.10 at q = 0.90).
+- The NUMBER of false confident alerts is not controlled: it grows with the number of candidate events (Isolation Forest 3 to 6 times, `diff` under a scale change 92 times).
+- Decision: report abstention as a calibrated second threshold, not as protection against drift. A check on the event rate is a possible future step, not tested.
+ 
